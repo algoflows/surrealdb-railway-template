@@ -1,0 +1,14 @@
+[build]
+builder = "dockerfile"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+numReplicas = 1
+sleepApplication = false
+restartPolicyType = "on_failure"
+
+[env]
+SURREAL_USER = "root"
+SURREAL_PASS = { generator = "hex", byteLength = 32 }
+SURREAL_LOG_LEVEL = "info"
+PORT = { default = 8000 }

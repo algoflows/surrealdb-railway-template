@@ -1,0 +1,209 @@
+version: '3.8'
+
+services:
+  # Placement Driver nodes for cluster coordination
+  pd0:
+    image: pingcap/pd:v8.5.0
+    environment:
+      - RAILWAY_STATIC_URL
+    command:
+      - --name=pd0
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://pd0:2379
+      - --advertise-peer-urls=http://pd0:2380
+      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
+      - --data-dir=/data/pd0
+      - --log-file=/logs/pd0.log
+    volumes:
+      - pd0_data:/data
+      - pd0_logs:/logs
+    restart: unless-stopped
+    healthcheck:
+      test: /pd-ctl health | jq -e ".[] | select(.name == \"$(hostname)\").health"
+      start_period: 10s
+      retries: 5
+      timeout: 10s
+      interval: 30s
+
+  pd1:
+    image: pingcap/pd:v8.5.0
+    environment:
+      - RAILWAY_STATIC_URL
+    command:
+      - --name=pd1
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://pd1:2379
+      - --advertise-peer-urls=http://pd1:2380
+      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
+      - --data-dir=/data/pd1
+      - --log-file=/logs/pd1.log
+    volumes:
+      - pd1_data:/data
+      - pd1_logs:/logs
+    restart: unless-stopped
+    healthcheck:
+      test: /pd-ctl health | jq -e ".[] | select(.name == \"$(hostname)\").health"
+      start_period: 10s
+      retries: 5
+      timeout: 10s
+      interval: 30s
+
+  pd2:
+    image: pingcap/pd:v8.5.0
+    environment:
+      - RAILWAY_STATIC_URL
+    command:
+      - --name=pd2
+      - --client-urls=http://0.0.0.0:2379
+      - --peer-urls=http://0.0.0.0:2380
+      - --advertise-client-urls=http://pd2:2379
+      - --advertise-peer-urls=http://pd2:2380
+      - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
+      - --data-dir=/data/pd2
+      - --log-file=/logs/pd2.log
+    volumes:
+      - pd2_data:/data
+      - pd2_logs:/logs
+    restart: unless-stopped
+    healthcheck:
+      test: /pd-ctl health | jq -e ".[] | select(.name == \"$(hostname)\").health"
+      start_period: 10s
+      retries: 5
+      timeout: 10s
+      interval: 30s
+
+  # TiKV storage nodes
+  tikv0:
+    image: pingcap/tikv:v8.5.0
+    environment:
+      - RAILWAY_STATIC_URL
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv0:20160
+      - --status-addr=0.0.0.0:20180
+      - --data-dir=/data/tikv0
+      - --pd=pd0:2379,pd1:2379,pd2:2379
+      - --log-file=/logs/tikv0.log
+    volumes:
+      - tikv0_data:/data
+      - tikv0_logs:/logs
+    depends_on:
+      pd0:
+        condition: service_healthy
+      pd1:
+        condition: service_healthy
+      pd2:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: /tikv-ctl --host $(hostname):20160 metrics
+      start_period: 15s
+      retries: 5
+      timeout: 10s
+      interval: 30s
+
+  tikv1:
+    image: pingcap/tikv:v8.5.0
+    environment:
+      - RAILWAY_STATIC_URL
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv1:20160
+      - --status-addr=0.0.0.0:20180
+      - --data-dir=/data/tikv1
+      - --pd=pd0:2379,pd1:2379,pd2:2379
+      - --log-file=/logs/tikv1.log
+    volumes:
+      - tikv1_data:/data
+      - tikv1_logs:/logs
+    depends_on:
+      pd0:
+        condition: service_healthy
+      pd1:
+        condition: service_healthy
+      pd2:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: /tikv-ctl --host $(hostname):20160 metrics
+      start_period: 15s
+      retries: 5
+      timeout: 10s
+      interval: 30s
+
+  tikv2:
+    image: pingcap/tikv:v8.5.0
+    environment:
+      - RAILWAY_STATIC_URL
+    command:
+      - --addr=0.0.0.0:20160
+      - --advertise-addr=tikv2:20160
+      - --status-addr=0.0.0.0:20180
+      - --data-dir=/data/tikv2
+      - --pd=pd0:2379,pd1:2379,pd2:2379
+      - --log-file=/logs/tikv2.log
+    volumes:
+      - tikv2_data:/data
+      - tikv2_logs:/logs
+    depends_on:
+      pd0:
+        condition: service_healthy
+      pd1:
+        condition: service_healthy
+      pd2:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: /tikv-ctl --host $(hostname):20160 metrics
+      start_period: 15s
+      retries: 5
+      timeout: 10s
+      interval: 30s
+
+  # SurrealDB main service
+  surrealdb:
+    image: surrealdb/surrealdb:latest
+    environment:
+      - PORT=8000
+      - SURREAL_USER=${SURREAL_USER:-root}
+      - SURREAL_PASS=${SURREAL_PASS:-root}
+      - RAILWAY_STATIC_URL
+    ports:
+      - "${PORT:-8000}:8000"
+    command:
+      - start
+      - --log=info
+      - --user=${SURREAL_USER:-root}
+      - --pass=${SURREAL_PASS:-root}
+      - --bind=0.0.0.0:8000
+      - tikv://pd0:2379
+    depends_on:
+      tikv0:
+        condition: service_healthy
+      tikv1:
+        condition: service_healthy
+      tikv2:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      start_period: 20s
+      retries: 5
+      timeout: 10s
+      interval: 30s
+
+volumes:
+  pd0_data:
+  pd0_logs:
+  pd1_data:
+  pd1_logs:
+  pd2_data:
+  pd2_logs:
+  tikv0_data:
+  tikv0_logs:
+  tikv1_data:
+  tikv1_logs:
+  tikv2_data:
+  tikv2_logs:

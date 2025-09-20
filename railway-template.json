@@ -1,0 +1,53 @@
+{
+  "name": "SurrealDB Cluster",
+  "description": "Production-ready SurrealDB cluster with TiKV backend for scalable multi-model database deployment",
+  "tags": [
+    "database",
+    "surrealdb",
+    "cluster",
+    "tikv",
+    "nosql",
+    "graph",
+    "document"
+  ],
+  "repository": "https://github.com/your-org/employlaw.ai",
+  "template": {
+    "services": [
+      {
+        "name": "surrealdb",
+        "serviceName": "surrealdb",
+        "source": {
+          "type": "image",
+          "image": "surrealdb/surrealdb:latest"
+        },
+        "variables": {
+          "SURREAL_USER": {
+            "description": "SurrealDB username",
+            "default": "root"
+          },
+          "SURREAL_PASS": {
+            "description": "SurrealDB password (auto-generated if not provided)",
+            "generate": true
+          },
+          "SURREAL_LOG_LEVEL": {
+            "description": "Log level (trace, debug, info, warn, error)",
+            "default": "info"
+          },
+          "DEPLOYMENT_TYPE": {
+            "description": "Deployment type: single or cluster",
+            "default": "single"
+          }
+        },
+        "domains": [
+          {
+            "name": "surrealdb"
+          }
+        ]
+      }
+    ]
+  },
+  "instructions": {
+    "start": "🚀 Your SurrealDB instance is deploying! It will be available at the generated Railway URL.",
+    "end": "✅ SurrealDB is ready! Connect using the provided URL and credentials. Check the logs for any startup messages."
+  }
+}

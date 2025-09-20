@@ -42,7 +42,7 @@ Deploy a production-ready SurrealDB cluster on Railway in minutes.
 
 ```bash
 # 1. Fork & clone the template
-git clone https://github.com/surrealdb/surrealdb-railway-template.git
+git clone https://github.com/algoflows/surrealdb-railway-template.git
 
 # 2. Deploy with Railway CLI
 npm install -g @railway/cli

@@ -13,11 +13,11 @@
     "distributed",
     "production"
   ],
-  "repository": "https://github.com/surrealdb/surrealdb-railway-template",
+  "repository": "https://github.com/algoflows/surrealdb-railway-template",
   "template": {
     "source": {
       "type": "repo",
-      "repo": "https://github.com/surrealdb/surrealdb-railway-template"
+      "repo": "https://github.com/algoflows/surrealdb-railway-template"
     },
     "services": {
       "surrealdb": {

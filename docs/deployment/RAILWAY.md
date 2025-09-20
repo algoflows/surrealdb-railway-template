@@ -92,7 +92,7 @@ railway logs --filter "level=error"
 ### Fork & Customize
 ```bash
 # 1. Fork the template repository
-git clone https://github.com/your-username/surrealdb-railway-template.git
+git clone https://github.com/algoflows/surrealdb-railway-template.git
 
 # 2. Edit docker-compose.yml for custom settings
 # 3. Update railway.toml for environment variables

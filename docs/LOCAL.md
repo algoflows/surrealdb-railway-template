@@ -6,7 +6,7 @@ Run the SurrealDB cluster locally for development and testing.
 
 ```bash
 # Clone and start
-git clone https://github.com/surrealdb/surrealdb-railway-template.git
+git clone https://github.com/algoflows/surrealdb-railway-template.git
 cd surrealdb-railway-template
 docker compose -f docker-compose.local.yml up -d
 

@@ -614,7 +614,7 @@ DEFINE TABLE user SCHEMAFULL;
 **Community Support:**
 - **[SurrealDB Discord](https://discord.gg/surrealdb)** - Active community
 - **[Railway Discord](https://discord.gg/railway)** - Platform support
-- **[GitHub Issues](https://github.com/surrealdb/surrealdb-railway-template/issues)** - Template-specific issues
+- **[GitHub Issues](https://github.com/algoflows/surrealdb-railway-template/issues)** - Template-specific issues
 
 **Documentation:**
 - **[SurrealDB Docs](https://surrealdb.com/docs)** - Official documentation
@@ -629,4 +629,4 @@ DEFINE TABLE user SCHEMAFULL;
 
 ---
 
-**💡 Don't see your question?** [Open an issue](https://github.com/surrealdb/surrealdb-railway-template/issues) and we'll add it to the FAQ!
+**💡 Don't see your question?** [Open an issue](https://github.com/algoflows/surrealdb-railway-template/issues) and we'll add it to the FAQ!

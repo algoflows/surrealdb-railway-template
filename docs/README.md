@@ -70,6 +70,6 @@ The template includes several deployment options:
 - **Global**: Multi-region deployment
 
 ### Support
-- **Issues**: [GitHub Issues](https://github.com/surrealdb/surrealdb-railway-template/issues)
+- **Issues**: [GitHub Issues](https://github.com/algoflows/surrealdb-railway-template/issues)
 - **Community**: [SurrealDB Discord](https://discord.gg/surrealdb)
 - **Railway**: [Railway Documentation](https://docs.railway.app)

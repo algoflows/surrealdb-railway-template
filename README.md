@@ -42,7 +42,7 @@
 
 ### Local Development
 ```bash
-git clone https://github.com/surrealdb/surrealdb-railway-template.git
+git clone https://github.com/algoflows/surrealdb-railway-template.git
 cd surrealdb-railway-template
 docker compose -f docker-compose.local.yml up -d
 ```
@@ -192,7 +192,7 @@ curl https://your-app.railway.app/tikv/metrics       # TiKV metrics
 ### Local Development Setup
 ```bash
 # Clone and start locally
-git clone https://github.com/surrealdb/surrealdb-railway-template.git
+git clone https://github.com/algoflows/surrealdb-railway-template.git
 cd surrealdb-railway-template
 
 # Start full cluster locally (matches Railway deployment)
@@ -537,7 +537,7 @@ git push
 We welcome contributions! Here's how you can help:
 
 ### 🐛 **Report Issues**
-- Found a bug? [Open an issue](https://github.com/surrealdb/surrealdb-railway-template/issues)
+- Found a bug? [Open an issue](https://github.com/algoflows/surrealdb-railway-template/issues)
 - Include deployment logs and error messages
 - Describe your Railway environment and configuration
 
@@ -577,7 +577,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ### 🚀 **Quick Help**
 - **[🤔 FAQ](./docs/FAQ.md)** - Frequently asked questions and troubleshooting
-- **[🐛 Issues](https://github.com/surrealdb/surrealdb-railway-template/issues)** - Report bugs or request features
+- **[🐛 Issues](https://github.com/algoflows/surrealdb-railway-template/issues)** - Report bugs or request features
 - **[💬 SurrealDB Discord](https://discord.gg/surrealdb)** - Community support
 - **[🚂 Railway Discord](https://discord.gg/railway)** - Railway platform support
 
@@ -589,7 +589,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 ### 🏢 **Official Links**
 - **[SurrealDB Website](https://surrealdb.com)** - Official SurrealDB website
 - **[Railway Website](https://railway.app)** - Railway platform
-- **[GitHub Repository](https://github.com/surrealdb/surrealdb-railway-template)** - This template's source code
+- **[GitHub Repository](https://github.com/algoflows/surrealdb-railway-template)** - This template's source code
 
 ---
 

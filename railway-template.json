@@ -35,6 +35,14 @@
               "length": 32
             }
           },
+          "SURREAL_NS": {
+            "description": "Default namespace to USE on startup",
+            "default": "app"
+          },
+          "SURREAL_DB": {
+            "description": "Default database to USE on startup",
+            "default": "app"
+          },
           "SURREAL_LOG_LEVEL": {
             "description": "Log level for SurrealDB (trace, debug, info, warn, error)",
             "default": "info"

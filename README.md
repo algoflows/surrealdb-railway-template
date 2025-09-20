@@ -368,6 +368,8 @@ The template automatically configures these variables for you:
 |----------|-------------|---------|----------------|
 | `SURREAL_USER` | Database root username | `root` | ❌ |
 | `SURREAL_PASS` | Database root password | - | ✅ (32-char hex) |
+| `SURREAL_NS` | Default namespace | `app` | ❌ |
+| `SURREAL_DB` | Default database | `app` | ❌ |
 | `SURREAL_LOG_LEVEL` | SurrealDB log level | `info` | ❌ |
 | `PD_LOG_LEVEL` | PD nodes log level | `info` | ❌ |
 | `TIKV_LOG_LEVEL` | TiKV nodes log level | `info` | ❌ |
@@ -394,6 +396,41 @@ The template automatically configures these variables for you:
 - **Expansion ready** - Contact Railway support for >250GB volumes
 
 **⚠️ Important:** Volume resizing requires downtime - **start with Pro plan** if you expect >5GB data
+
+### Migrations & Seeding
+
+Run idempotent schema/seed migrations:
+```bash
+./scripts/migrate.sh https://your-app.railway.app root "$SURREAL_PASS" "$SURREAL_NS" "$SURREAL_DB" db/init.surql
+```
+
+### Backups & Restore
+
+Backup with SQL EXPORT:
+```bash
+./scripts/backup.sh https://your-app.railway.app root "$SURREAL_PASS" "$SURREAL_NS" "$SURREAL_DB" ./backups
+```
+
+Restore from a backup file:
+```bash
+./scripts/restore.sh https://your-app.railway.app root "$SURREAL_PASS" "$SURREAL_NS" "$SURREAL_DB" backups/backup-...surql
+```
+
+Railway Function (Bun) admin (optional):
+```ts
+// functions/admin.ts
+// Supported actions: health | backup | exportTable | migrate
+// Schedule backup via:  https://<fn-url>?action=backup
+// Auth: send header X-Admin-Signature: $ADMIN_SECRET
+```
+Schedule via Railway Deploy Triggers (daily) using ?action=backup.
+
+### Volume Usage Monitor
+
+Check local/docker volume occupancy (warns at 80/90%):
+```bash
+./scripts/volume-usage.sh
+```
 
 ### Monitoring & Observability
 

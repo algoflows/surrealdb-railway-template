@@ -266,16 +266,23 @@ CREATE metrics:cpu SET {
 **Recommended backup strategy:**
 
 ```bash
-# 1. Create backup script
-curl -X POST https://your-surrealdb.railway.app/export \
+# Option A: SQL EXPORT over HTTP
+curl -X POST https://your-app.railway.app/sql \
   -H "Content-Type: application/json" \
   -u "root:your_password" \
-  -d '{"ns": "your_namespace", "db": "your_database"}' \
+  -d '{"sql": "USE NS app; USE DB app; EXPORT FOR DB;"}' \
   > backup-$(date +%Y%m%d).surql
 
-# 2. Store backup safely (outside Railway)
-# Upload to S3, Google Drive, or download locally
+# Option B: Use provided script (recommended)
+./scripts/backup.sh https://your-app.railway.app root "$SURREAL_PASS" "$SURREAL_NS" "$SURREAL_DB" ./backups
+
+# Option C: Upload to pre-signed URL (S3/GCS)
+./scripts/backup-to-url.sh https://your-app.railway.app root "$SURREAL_PASS" "$SURREAL_NS" "$SURREAL_DB" "https://<presigned-url>"
 ```
+
+**Railway Function (Bun) alternative:**
+- Use `functions/admin.ts` and call `?action=backup` with header `X-Admin-Signature: $ADMIN_SECRET`
+- Schedule via Deploy Triggers → Scheduled HTTP
 
 ## 🚀 Deployment & Configuration
 

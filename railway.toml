@@ -10,6 +10,8 @@ restartPolicyType = "on_failure"
 [env]
 SURREAL_USER = "root"
 SURREAL_PASS = { generator = "hex", byteLength = 32 }
+SURREAL_NS = { default = "app" }
+SURREAL_DB = { default = "app" }
 SURREAL_LOG_LEVEL = "info"
 PD_LOG_LEVEL = "info"
 TIKV_LOG_LEVEL = "info"

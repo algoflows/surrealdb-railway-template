@@ -1,8 +1,0 @@
-[build]
-builder = "DOCKERCOMPOSE"
-dockerComposeFile = "docker-compose.yml"
-
-[deploy]
-numReplicas = 1
-sleepApplication = false
-restartPolicyType = "ON_FAILURE"

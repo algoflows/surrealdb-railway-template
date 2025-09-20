@@ -5,17 +5,4 @@ dockerComposeFile = "docker-compose.yml"
 [deploy]
 numReplicas = 1
 sleepApplication = false
-restartPolicyType = "on_failure"
-
-[env]
-SURREAL_USER = "root"
-SURREAL_PASS = { generator = "hex", byteLength = 32 }
-SURREAL_NS = { default = "app" }
-SURREAL_DB = { default = "app" }
-SURREAL_LOG_LEVEL = "info"
-PD_LOG_LEVEL = "info"
-TIKV_LOG_LEVEL = "info"
-PORT = { default = 8000 }
-
-# Railway automatically handles observability
-# Structured JSON logging is configured for optimal parsing
+restartPolicyType = "ON_FAILURE"

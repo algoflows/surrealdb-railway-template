@@ -1,13 +1,13 @@
 version: '3.8'
 
-# SurrealDB Optimized HA - Full High Availability at Reasonable Cost
+# SurrealDB Minimal HA - Coordinator High Availability
 #
-# 7 services: 3 PD + 3 TiKV + 1 SurrealDB
-# Cost: ~$46-62/month (vs $72-98 for heavy HA)
-# True HA: Any single node can fail without downtime
+# 5 services: 3 PD (HA) + 1 TiKV + 1 SurrealDB
+# Cost: ~$20-30/month
+# Protects against coordinator failures (most common)
 
 services:
-  # PD Cluster - 3 lean nodes for consensus
+  # PD Cluster - 3 nodes for consensus (HA)
   pd0:
     image: pingcap/pd:v8.5.0
     environment:
@@ -27,7 +27,7 @@ services:
     deploy:
       resources:
         limits:
-          memory: 256M # Lean but sufficient for coordination
+          memory: 256M
           cpus: '0.25'
         reservations:
           memory: 128M
@@ -110,7 +110,7 @@ services:
       timeout: 10s
       interval: 30s
 
-  # TiKV Cluster - 3 lean nodes for storage replication
+  # Single TiKV node (still single point, but coordinator is HA)
   tikv0:
     image: pingcap/tikv:v8.5.0
     environment:
@@ -124,16 +124,16 @@ services:
       - --log-level=${TIKV_LOG_LEVEL:-info}
       - --log-format=json
       - --config-check-interval=10s
-      - --grpc-concurrency=2 # Lean but functional
+      - --grpc-concurrency=2
       - --grpc-concurrent-stream=512
     deploy:
       resources:
         limits:
-          memory: 512M # Lean storage nodes
-          cpus: '0.5'
+          memory: 1G # Slightly bigger since it's the only storage node
+          cpus: '1.0'
         reservations:
-          memory: 256M
-          cpus: '0.25'
+          memory: 512M
+          cpus: '0.5'
     volumes:
       - tikv0_data:/data
     depends_on:
@@ -151,87 +151,7 @@ services:
       timeout: 10s
       interval: 30s
 
-  tikv1:
-    image: pingcap/tikv:v8.5.0
-    environment:
-      - RAILWAY_STATIC_URL
-    command:
-      - --addr=0.0.0.0:20160
-      - --advertise-addr=tikv1:20160
-      - --status-addr=0.0.0.0:20180
-      - --data-dir=/data/tikv1
-      - --pd=pd0:2379,pd1:2379,pd2:2379
-      - --log-level=${TIKV_LOG_LEVEL:-info}
-      - --log-format=json
-      - --config-check-interval=10s
-      - --grpc-concurrency=2
-      - --grpc-concurrent-stream=512
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '0.5'
-        reservations:
-          memory: 256M
-          cpus: '0.25'
-    volumes:
-      - tikv1_data:/data
-    depends_on:
-      pd0:
-        condition: service_healthy
-      pd1:
-        condition: service_healthy
-      pd2:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: /tikv-ctl --host $(hostname):20160 metrics
-      start_period: 15s
-      retries: 5
-      timeout: 10s
-      interval: 30s
-
-  tikv2:
-    image: pingcap/tikv:v8.5.0
-    environment:
-      - RAILWAY_STATIC_URL
-    command:
-      - --addr=0.0.0.0:20160
-      - --advertise-addr=tikv2:20160
-      - --status-addr=0.0.0.0:20180
-      - --data-dir=/data/tikv2
-      - --pd=pd0:2379,pd1:2379,pd2:2379
-      - --log-level=${TIKV_LOG_LEVEL:-info}
-      - --log-format=json
-      - --config-check-interval=10s
-      - --grpc-concurrency=2
-      - --grpc-concurrent-stream=512
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '0.5'
-        reservations:
-          memory: 256M
-          cpus: '0.25'
-    volumes:
-      - tikv2_data:/data
-    depends_on:
-      pd0:
-        condition: service_healthy
-      pd1:
-        condition: service_healthy
-      pd2:
-        condition: service_healthy
-    restart: unless-stopped
-    healthcheck:
-      test: /tikv-ctl --host $(hostname):20160 metrics
-      start_period: 15s
-      retries: 5
-      timeout: 10s
-      interval: 30s
-
-  # SurrealDB query engine (can scale replicas via Railway dashboard)
+  # SurrealDB query engine (scale replicas via Railway dashboard)
   surrealdb:
     image: surrealdb/surrealdb:latest
     environment:
@@ -253,17 +173,13 @@ services:
     deploy:
       resources:
         limits:
-          memory: 1G # Lean but sufficient for most workloads
+          memory: 1G
           cpus: '1.0'
         reservations:
           memory: 512M
           cpus: '0.5'
     depends_on:
       tikv0:
-        condition: service_healthy
-      tikv1:
-        condition: service_healthy
-      tikv2:
         condition: service_healthy
     restart: unless-stopped
     healthcheck:
@@ -278,29 +194,9 @@ volumes:
   pd1_data:
   pd2_data:
   tikv0_data:
-  tikv1_data:
-  tikv2_data:
-# Railway Volume Limits (as of 2024):
-# - Free/Trial: 0.5GB per volume
-# - Hobby: 5GB per volume
-# - Pro/Team: 50GB per volume (expandable to 250GB via support)
+# HA Strategy:
+# 1. PD Cluster (3 nodes) - Can lose 1 node and stay operational
+# 2. TiKV Single Node - Still a single point, but coordinator failures are more common
+# 3. SurrealDB - Scale replicas via Railway dashboard for query layer HA
 #
-# IMPORTANT: Each service gets ONE volume, resizing requires downtime
-# Pro users can request expansion beyond 250GB via Railway support
-#
-# Our template uses 6 volumes total:
-# - 3 PD volumes (coordination data, small usage)
-# - 3 TiKV volumes (your actual database data)
-#
-# Recommended Railway Plan: Pro ($20/month) for 50GB volumes
-# Optimized HA Benefits:
-# ✅ Full high availability - any single node can fail
-# ✅ Reasonable cost - ~$46-62/month vs $72-98 for heavy HA
-# ✅ Production ready - handles 1K-5K concurrent users
-# ✅ Scalable - increase resources via Railway dashboard as needed
-# ✅ True 3x replication - your data is safe
-#
-# Scale up resources when you need more performance:
-# - Increase memory/CPU limits via Railway dashboard
-# - Add SurrealDB replicas for query performance
-# - This gives you the foundation to scale to enterprise levels
+# Next Step: When you need storage HA, add tikv1 and tikv2 nodes

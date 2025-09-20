@@ -1,6 +1,6 @@
 [build]
-builder = "dockerfile"
-dockerfilePath = "Dockerfile"
+builder = "dockercompose"
+dockerComposeFile = "docker-compose.yml"
 
 [deploy]
 numReplicas = 1
@@ -11,4 +11,9 @@ restartPolicyType = "on_failure"
 SURREAL_USER = "root"
 SURREAL_PASS = { generator = "hex", byteLength = 32 }
 SURREAL_LOG_LEVEL = "info"
+PD_LOG_LEVEL = "info"
+TIKV_LOG_LEVEL = "info"
 PORT = { default = 8000 }
+
+# Railway automatically handles observability
+# Structured JSON logging is configured for optimal parsing

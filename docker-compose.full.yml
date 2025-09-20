@@ -1,5 +1,12 @@
 version: '3.8'
 
+# SurrealDB Cluster Configuration for Railway
+# 
+# Logging Options:
+# - Railway (default): Uses structured JSON logging to Railway dashboards
+# - File-based: Uncomment log volume mounts and --log-file options for traditional file logging
+# - Both: Can be used simultaneously for hybrid logging approaches
+
 services:
   # Placement Driver nodes for cluster coordination
   pd0:
@@ -14,10 +21,24 @@ services:
       - --advertise-peer-urls=http://pd0:2380
       - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
       - --data-dir=/data/pd0
-      - --log-file=/logs/pd0.log
+      - --log-level=${PD_LOG_LEVEL:-info}
+      - --log-format=json
+      # Uncomment for file-based logging:
+      # - --log-file=/logs/pd0.log
+      - --lease=3
+      - --enable-grpc-gateway=true
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
     volumes:
       - pd0_data:/data
-      - pd0_logs:/logs
+      # Uncomment for file-based logging (not needed for Railway)
+      # - pd0_logs:/logs
     restart: unless-stopped
     healthcheck:
       test: /pd-ctl health | jq -e ".[] | select(.name == \"$(hostname)\").health"
@@ -38,10 +59,24 @@ services:
       - --advertise-peer-urls=http://pd1:2380
       - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
       - --data-dir=/data/pd1
-      - --log-file=/logs/pd1.log
+      - --log-level=${PD_LOG_LEVEL:-info}
+      - --log-format=json
+      # Uncomment for file-based logging:
+      # - --log-file=/logs/pd1.log
+      - --lease=3
+      - --enable-grpc-gateway=true
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
     volumes:
       - pd1_data:/data
-      - pd1_logs:/logs
+      # Uncomment for file-based logging (not needed for Railway)
+      # - pd1_logs:/logs
     restart: unless-stopped
     healthcheck:
       test: /pd-ctl health | jq -e ".[] | select(.name == \"$(hostname)\").health"
@@ -62,10 +97,24 @@ services:
       - --advertise-peer-urls=http://pd2:2380
       - --initial-cluster=pd0=http://pd0:2380,pd1=http://pd1:2380,pd2=http://pd2:2380
       - --data-dir=/data/pd2
-      - --log-file=/logs/pd2.log
+      - --log-level=${PD_LOG_LEVEL:-info}
+      - --log-format=json
+      # Uncomment for file-based logging:
+      # - --log-file=/logs/pd2.log
+      - --lease=3
+      - --enable-grpc-gateway=true
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
     volumes:
       - pd2_data:/data
-      - pd2_logs:/logs
+      # Uncomment for file-based logging (not needed for Railway)
+      # - pd2_logs:/logs
     restart: unless-stopped
     healthcheck:
       test: /pd-ctl health | jq -e ".[] | select(.name == \"$(hostname)\").health"
@@ -85,10 +134,26 @@ services:
       - --status-addr=0.0.0.0:20180
       - --data-dir=/data/tikv0
       - --pd=pd0:2379,pd1:2379,pd2:2379
-      - --log-file=/logs/tikv0.log
+      - --log-level=${TIKV_LOG_LEVEL:-info}
+      - --log-format=json
+      # Uncomment for file-based logging:
+      # - --log-file=/logs/tikv0.log
+      - --config-check-interval=10s
+      - --grpc-concurrency=4
+      - --grpc-concurrent-stream=1024
+      - --grpc-raft-conn-num=1
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
     volumes:
       - tikv0_data:/data
-      - tikv0_logs:/logs
+      # Uncomment for file-based logging (not needed for Railway)
+      # - tikv0_logs:/logs
     depends_on:
       pd0:
         condition: service_healthy
@@ -114,10 +179,26 @@ services:
       - --status-addr=0.0.0.0:20180
       - --data-dir=/data/tikv1
       - --pd=pd0:2379,pd1:2379,pd2:2379
-      - --log-file=/logs/tikv1.log
+      - --log-level=${TIKV_LOG_LEVEL:-info}
+      - --log-format=json
+      # Uncomment for file-based logging:
+      # - --log-file=/logs/tikv1.log
+      - --config-check-interval=10s
+      - --grpc-concurrency=4
+      - --grpc-concurrent-stream=1024
+      - --grpc-raft-conn-num=1
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
     volumes:
       - tikv1_data:/data
-      - tikv1_logs:/logs
+      # Uncomment for file-based logging (not needed for Railway)
+      # - tikv1_logs:/logs
     depends_on:
       pd0:
         condition: service_healthy
@@ -143,10 +224,26 @@ services:
       - --status-addr=0.0.0.0:20180
       - --data-dir=/data/tikv2
       - --pd=pd0:2379,pd1:2379,pd2:2379
-      - --log-file=/logs/tikv2.log
+      - --log-level=${TIKV_LOG_LEVEL:-info}
+      - --log-format=json
+      # Uncomment for file-based logging:
+      # - --log-file=/logs/tikv2.log
+      - --config-check-interval=10s
+      - --grpc-concurrency=4
+      - --grpc-concurrent-stream=1024
+      - --grpc-raft-conn-num=1
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
     volumes:
       - tikv2_data:/data
-      - tikv2_logs:/logs
+      # Uncomment for file-based logging (not needed for Railway)
+      # - tikv2_logs:/logs
     depends_on:
       pd0:
         condition: service_healthy
@@ -174,11 +271,21 @@ services:
       - "${PORT:-8000}:8000"
     command:
       - start
-      - --log=info
+      - --log=${SURREAL_LOG_LEVEL:-info}
       - --user=${SURREAL_USER:-root}
       - --pass=${SURREAL_PASS:-root}
       - --bind=0.0.0.0:8000
-      - tikv://pd0:2379
+      - --query-timeout=30s
+      - --transaction-timeout=10s
+      - tikv://pd0:2379,pd1:2379,pd2:2379
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2.0'
+        reservations:
+          memory: 1G
+          cpus: '1.0'
     depends_on:
       tikv0:
         condition: service_healthy
@@ -196,14 +303,15 @@ services:
 
 volumes:
   pd0_data:
-  pd0_logs:
   pd1_data:
-  pd1_logs:
   pd2_data:
-  pd2_logs:
   tikv0_data:
-  tikv0_logs:
   tikv1_data:
-  tikv1_logs:
   tikv2_data:
-  tikv2_logs:
+  # Optional log volumes (uncomment if using file-based logging)
+  # pd0_logs:
+  # pd1_logs:
+  # pd2_logs:
+  # tikv0_logs:
+  # tikv1_logs:
+  # tikv2_logs:
